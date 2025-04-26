@@ -45,7 +45,7 @@
     enable = true;
     driSupport32Bit = true;
   };
-  
+
   # TrackPoint configuration
   hardware.trackpoint = {
     enable = true;
@@ -53,6 +53,10 @@
     sensitivity = 100;
     speed = 100;
   };
+
+  # Bluetooth & Wireless Connection Setup
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
 
   # Networking
   networking.hostName = "nixos";
