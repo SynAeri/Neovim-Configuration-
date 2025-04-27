@@ -151,7 +151,10 @@
   environment.systemPackages = with pkgs; [
     # Editors
     neovim
-    
+
+    # SSH Sys
+    openssh
+
     # Window Manager & Desktop
     bspwm
     sxhkd
@@ -162,7 +165,8 @@
     rofi
     eww
     polybarFull
-    
+
+
     # Web & Media
     firefox
     fastfetch
@@ -171,7 +175,10 @@
     playerctl
     xdotool
     pulseaudio
-    
+
+    # Docker
+    pkgs.docker_27
+
     # Eww dependencies
     cairo
     gtk3
@@ -200,7 +207,7 @@
     # Graphics
     vulkan-tools
     glxinfo
-    
+
     # CLI Utilities
     bottom
     lf
