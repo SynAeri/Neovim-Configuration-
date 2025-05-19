@@ -1,10 +1,20 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
+    ./users.nix
   ];
+
+
+  # Home Manager
+  home-manager = {
+    extraSpecialArgs = {inherit inputs; };
+    users = {
+    "jordanm" = import ./home.nix;
+    };
+  };
 
   boot.initrd.kernelModules = [ "i2c_hid"];
   # System & Bootloader
@@ -14,6 +24,9 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelModules = [ "i915" ];
   boot.kernelParams = [
+    "i915.enable_psr=0"
+    "i915.enable_fbc=1"
+    "i915.fastboot=1"
     "i915.enable_guc=3"
     "i915.force_probe=7d45"
     #"acpi_osi=Linux"
@@ -62,6 +75,8 @@
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
   networking.nameservers = [ "1.1.1.1" "8.8.8.8" ];
+  networking.firewall.allowedTCPPorts = [ 3000 ];
+
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -121,14 +136,7 @@
   
   nixpkgs.config.allowUnfree = true;
 
-  # User Configuration
-  users.users.jordanm = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    description = "jordan maquiran";
-    extraGroups = [ "networkmanager" "wheel" "audio" "input" "video" ];
-    packages = with pkgs; [];
-  };
+
 
   # Shell & Editors
   programs.zsh.enable = true;
@@ -140,7 +148,13 @@
 
   # Fonts
   fonts.packages = with pkgs; [
-    nerdfonts
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.fira-code
+    nerd-fonts.hack
+    nerd-fonts.inconsolata
+    nerd-fonts.sauce-code-pro
+    nerd-fonts.ubuntu-mono
+    nerd-fonts.dejavu-sans-mono
     termsyn
     texlivePackages.fontawesome
     noto-fonts
@@ -159,19 +173,45 @@
     bspwm
     sxhkd
     alacritty
-    picom
     xterm
     feh
     rofi
     eww
     polybarFull
 
+    # Picom Dependencies
+    pkg-config 
+    picom
+    pkgs.libconfig
+    ninja
+    meson
+    libev
+    libevdev
+
+    # Additional dependencies
+    xorg.libXext
+    xorg.libXrender
+    xorg.libXrandr
+    xorg.libXcomposite
+    xorg.libXfixes
+    xorg.libXdamage
+    xorg.xorgproto
+    xorg.libxcb
+    xorg.xcbutilrenderutil
+    xorg.xcbutilimage 
+    xorg.libX11
+    xorg.libX11
+
+    pixman
+    dbus
+    pcre2
+    uthash
 
     # Web & Media
     firefox
     fastfetch
-    gwenview
     youtube-music
+    kdePackages.gwenview  # For the Qt 6 version (recommended)
     playerctl
     xdotool
     pulseaudio
@@ -200,6 +240,7 @@
     gzip
     pkgs.brightnessctl
     libinput
+    yarn
 
     # Display Manager
     physlock
@@ -207,6 +248,9 @@
     # Graphics
     vulkan-tools
     glxinfo
+
+    # Images
+    ueberzug
 
     # CLI Utilities
     bottom
@@ -225,6 +269,10 @@
     # Networking
     iw
   ];
+
+  # NIXOS
+  nix.settings.trusted-users = [ "root" "jordanm" ];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Additional Services
   # services.openssh.enable = true;
