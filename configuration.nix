@@ -5,7 +5,6 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./users.nix
-    ./modules/editors/neovim.nix
   ];
 
 
@@ -16,6 +15,12 @@
     "jordanm" = import ./home.nix;
     };
   };
+
+
+
+
+
+
 
   boot.initrd.kernelModules = [ "i2c_hid"];
   # System & Bootloader
@@ -142,10 +147,7 @@
   # Shell & Editors
   programs.zsh.enable = true;
   programs.zsh.ohMyZsh.enable = true;
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-  };
+
 
   # Fonts
   fonts.packages = with pkgs; [
@@ -282,4 +284,51 @@
   #   enable = true;
   #   enableSSHSupport = true;
   # };
+
+
+  # NEOVIM
+
+programs.neovim = {
+  enable = true;
+  defaultEditor = true;
+  viAlias = true;
+  vimAlias = true;
+  
+  configure = {
+    packages.myVimPackage = with pkgs.vimPlugins; {
+      start = [
+        # Core plugins
+        nvim-lspconfig
+        nvim-cmp
+        telescope-nvim
+        plenary-nvim
+        
+        # Theme and UI
+        tokyonight-nvim
+        lualine-nvim
+      ];
+    };
+    
+    customRC = ''
+      " Set color scheme and UI options
+      set termguicolors
+      colorscheme tokyonight
+      
+      " Set some distinctive visual options
+      set number
+      set relativenumber
+      set cursorline
+      
+      " Configure status line
+      lua << EOF
+      require('lualine').setup {
+        options = {
+          theme = 'tokyonight',
+          icons_enabled = true,
+        }
+      }
+      EOF
+    '';
+  };
+};
 }
