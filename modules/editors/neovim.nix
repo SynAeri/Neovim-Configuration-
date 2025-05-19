@@ -1,5 +1,4 @@
 { config, pkgs, lib, ... }:
-
 {
   # Enable Neovim with Nix
   programs.neovim = {
@@ -8,31 +7,43 @@
     viAlias = true;
     vimAlias = true;
     
-    # We'll start with a minimal package list and keep using your existing config
     configure = {
-      # Just list a few core plugins to start with
       packages.myVimPackage = with pkgs.vimPlugins; {
         start = [
-          # Add a few essential plugins you're using
-          # For example:
+          # Core plugins
           nvim-lspconfig
           nvim-cmp
           telescope-nvim
           plenary-nvim
           
-          # List more plugins from your current setup here
-	  tokyonight-nvim
-	  lualine-nvim
-
+          # Theme and UI
+          tokyonight-nvim
+          lualine-nvim
         ];
       };
       
-      # This is where we'll gradually migrate your config
       customRC = ''
-        " Import your existing config
+        " Set color scheme and UI options
+        set termguicolors
+        colorscheme tokyonight
+        
+        " Set some distinctive visual options
+        set number
+        set relativenumber
+        set cursorline
+        
+        " Configure status line
+        lua << EOF
+        require('lualine').setup {
+          options = {
+            theme = 'tokyonight',
+            icons_enabled = true,
+            component_separators = { left = '|', right = '|'},
+            section_separators = { left = '', right = ''},
+          }
+        }
+        EOF
       '';
     };
-    
-    # Any system-level packages needed by your plugins
   };
 }
