@@ -5,6 +5,7 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./users.nix
+    ./modules/editors/neovim.nix
   ];
 
 
