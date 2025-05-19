@@ -5,7 +5,7 @@
   # manage.
   home.username = "jordanm";
   home.homeDirectory = "/home/jordanm";
-
+  
   # This value determines the Home Manager release that your configuration is
   # compatible with. This helps avoid breakage when a new Home Manager release
   # introduces backwards incompatible changes.
@@ -14,6 +14,21 @@
   # want to update the value, then make sure to first check the Home Manager
   # release notes.
   home.stateVersion = "25.05"; # Please read the comment before changing.
+  programs.home-manager.enable = true;
+  programs.git.enable = true;
+  programs.neovim = {
+   enable = true;
+   defaultEditor = true;
+   vimAlias = true;
+
+   plugins = with.pkgs.vimPlugins; [
+     nvim-lspconfig
+     nvim-treesitter.withAllGrammars
+     plenary-nvim
+     gruvbox-material
+     mini-nvim
+   ]
+  }
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
