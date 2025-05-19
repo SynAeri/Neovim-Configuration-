@@ -19,6 +19,7 @@
         ./configuration.nix
         # If you want to use home-manager, uncomment the line below
         home-manager.nixosModules.home-manager
+        ./modules/editors/neovim.nix
       ];
     };
   };
