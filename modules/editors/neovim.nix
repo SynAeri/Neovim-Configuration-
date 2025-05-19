@@ -21,6 +21,9 @@
           plenary-nvim
           
           # List more plugins from your current setup here
+	  tokyonight-nvim
+	  lualine-nvim
+
         ];
       };
       
