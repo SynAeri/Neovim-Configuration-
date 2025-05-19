@@ -21,14 +21,15 @@
    defaultEditor = true;
    vimAlias = true;
 
-   plugins = with.pkgs.vimPlugins; [
+   plugins = with pkgs.vimPlugins; [
      nvim-lspconfig
      nvim-treesitter.withAllGrammars
      plenary-nvim
      gruvbox-material
      mini-nvim
-   ]
-  }
+   ];
+
+  };
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
@@ -87,5 +88,5 @@
   };
 
   # Let Home Manager install and manage itself.
-  programs.home-manager.enable = true;
+  # programs.home-manager.enable = true;
 }
