@@ -27,15 +27,9 @@
       # This is where we'll gradually migrate your config
       customRC = ''
         " Import your existing config
-        source ~/.config/nvim/init.vim
       '';
     };
     
     # Any system-level packages needed by your plugins
-    extraPackages = with pkgs; [
-      # Example language servers or tools
-      ripgrep
-      fd
-    ];
   };
 }
