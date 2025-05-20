@@ -27,6 +27,7 @@
      plenary-nvim
      gruvbox-material
      mini-nvim
+     tokyonight-nvim
    ];
 
   };
