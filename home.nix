@@ -51,9 +51,6 @@ in
       
       # Status line
       lualine-nvim
-      
-      # Example of using the fromGitHub function for a plugin not in nixpkgs
-      (fromGitHub "HEAD" "folke/which-key.nvim")
     ];
   };
   
