@@ -10,6 +10,7 @@ let
     };
   };
 in
+
 {
   # Home Manager config here
   home.username = "jordanm";
@@ -17,41 +18,24 @@ in
   
   # Let Home Manager manage itself
   programs.home-manager.enable = true;
-  
-  # Neovim configuration
+  programs.git.enable = true;
   programs.neovim = {
     enable = true;
     defaultEditor = true;
     viAlias = true;
     vimAlias = true;
     vimdiffAlias = true;
-    
     plugins = with pkgs.vimPlugins; [
-      # LSP
       nvim-lspconfig
-      
-      # Treesitter with specific languages
       nvim-treesitter.withAllGrammars
-
-      # Completion
-      nvim-cmp
-      cmp-nvim-lsp
-      cmp-buffer
-      cmp-path
-      
-      # Snippets
-      luasnip
-      
-      # Utilities
       plenary-nvim
-      telescope-nvim
-      
-      # Theme
-      tokyonight-nvim
-      
-      # Status line
-      lualine-nvim
+      gruvbox-material
+      mini-nvim
+      (fromGitHub "HEAD" "elihunter173/dirbuf.nvim")
     ];
+    # Use the Nix package search engine to find
+    # even more plugins : https://search.nixos.org/packages
+  };
   };
   
   # Add other Home Manager configurations here
