@@ -8,13 +8,12 @@
   ];
 
 
-#  # Home Manager
-#  home-manager = {
-#    extraSpecialArgs = {inherit inputs; };
-#    users = {
-#    "jordanm" = import ./home.nix;
-#    };
-#  };
+# Home Manager setup
+home-manager = {
+  useGlobalPkgs = true;
+  useUserPackages = true;
+  users.jordanm = import ./home.nix;
+};
 
 
 
@@ -276,7 +275,7 @@
   # NIXOS
   nix.settings.trusted-users = [ "root" "jordanm" ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
+  programs.neovim.enable = false;
   # Additional Services
   # services.openssh.enable = true;
   # programs.mtr.enable = true;

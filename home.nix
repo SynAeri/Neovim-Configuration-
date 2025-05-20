@@ -1,93 +1,158 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
+let
+  fromGitHub = ref: repo: pkgs.vimUtils.buildVimPlugin {
+    pname = "${lib.strings.sanitizeDerivationName repo}";
+    version = ref;
+    src = builtins.fetchGit {
+      url = "https://github.com/${repo}.git";
+      ref = ref;
+    };
+  };
+in
 {
-  # Home Manager needs a bit of information about you and the paths it should
-  # manage.
+  # Home Manager config here
   home.username = "jordanm";
   home.homeDirectory = "/home/jordanm";
   
-  # This value determines the Home Manager release that your configuration is
-  # compatible with. This helps avoid breakage when a new Home Manager release
-  # introduces backwards incompatible changes.
-  #
-  # You should not change this value, even if you update Home Manager. If you do
-  # want to update the value, then make sure to first check the Home Manager
-  # release notes.
-  home.stateVersion = "25.05"; # Please read the comment before changing.
+  # Let Home Manager manage itself
   programs.home-manager.enable = true;
-  programs.git.enable = true;
+  
+  # Neovim configuration
   programs.neovim = {
-   enable = true;
-   defaultEditor = true;
-   vimAlias = true;
-
-   plugins = with pkgs.vimPlugins; [
-     nvim-lspconfig
-     nvim-treesitter.withAllGrammars
-     plenary-nvim
-     gruvbox-material
-     mini-nvim
-     tokyonight-nvim
-   ];
-
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    vimdiffAlias = true;
+    
+    plugins = with pkgs.vimPlugins; [
+      # LSP
+      nvim-lspconfig
+      
+      # Treesitter with specific languages
+      (nvim-treesitter.withPlugins (plugins: with plugins; [
+        bash
+        c
+        lua
+        nix
+        python
+        javascript
+        typescript
+        html
+        css
+        json
+      ]))
+      
+      # Completion
+      nvim-cmp
+      cmp-nvim-lsp
+      cmp-buffer
+      cmp-path
+      
+      # Snippets
+      luasnip
+      cmp-luasnip
+      
+      # Utilities
+      plenary-nvim
+      telescope-nvim
+      
+      # Theme
+      tokyonight-nvim
+      
+      # Status line
+      lualine-nvim
+      
+      # Example of using the fromGitHub function for a plugin not in nixpkgs
+      (fromGitHub "HEAD" "folke/which-key.nvim")
+    ];
+    
+    # Your Neovim configuration
+    extraConfig = ''
+      " Basic settings
+      set number
+      set relativenumber
+      set expandtab
+      set tabstop=2
+      set shiftwidth=2
+      set autoindent
+      set termguicolors
+      
+      " Set the leader key
+      let mapleader = " "
+      
+      " Theme
+      colorscheme tokyonight
+    '';
+    
+    # Lua configuration (for plugins that need it)
+    extraLuaConfig = ''
+      -- LSP Configuration
+      local lspconfig = require('lspconfig')
+      
+      -- Setup language servers
+      lspconfig.pyright.setup{}
+      lspconfig.tsserver.setup{}
+      lspconfig.nil_ls.setup{}  -- Nix LSP
+      
+      -- Status line
+      require('lualine').setup{
+        options = {
+          theme = 'tokyonight',
+          component_separators = { left = '|', right = '|'},
+          section_separators = { left = '', right = ''},
+        }
+      }
+      
+      -- Telescope keymaps
+      local builtin = require('telescope.builtin')
+      vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+      vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+      
+      -- Setup which-key
+      require("which-key").setup{}
+      
+      -- Setup nvim-cmp
+      local cmp = require('cmp')
+      local luasnip = require('luasnip')
+      
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+          ['<C-f>'] = cmp.mapping.scroll_docs(4),
+          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<C-e>'] = cmp.mapping.abort(),
+          ['<CR>'] = cmp.mapping.confirm({ select = true }),
+          ['<Tab>'] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { 'i', 's' }),
+        }),
+        sources = cmp.config.sources({
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+        }, {
+          { name = 'buffer' },
+        })
+      })
+    '';
   };
-
-  # The home.packages option allows you to install Nix packages into your
-  # environment.
-  home.packages = [
-    # # Adds the 'hello' command to your environment. It prints a friendly
-    # # "Hello, world!" when run.
-    # pkgs.hello
-
-    # # It is sometimes useful to fine-tune packages, for example, by applying
-    # # overrides. You can do that directly here, just don't forget the
-    # # parentheses. Maybe you want to install Nerd Fonts with a limited number of
-    # # fonts?
-    # (pkgs.nerdfonts.override { fonts = [ "FantasqueSansMono" ]; })
-
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
-  ];
-
-  # Home Manager is pretty good at managing dotfiles. The primary way to manage
-  # plain files is through 'home.file'.
-  home.file = {
-    # # Building this configuration will create a copy of 'dotfiles/screenrc' in
-    # # the Nix store. Activating the configuration will then make '~/.screenrc' a
-    # # symlink to the Nix store copy.
-    # ".screenrc".source = dotfiles/screenrc;
-
-    # # You can also set the file content immediately.
-    # ".gradle/gradle.properties".text = ''
-    #   org.gradle.console=verbose
-    #   org.gradle.daemon.idletimeout=3600000
-    # '';
-  };
-
-  # Home Manager can also manage your environment variables through
-  # 'home.sessionVariables'. These will be explicitly sourced when using a
-  # shell provided by Home Manager. If you don't want to manage your shell
-  # through Home Manager then you have to manually source 'hm-session-vars.sh'
-  # located at either
-  #
-  #  ~/.nix-profile/etc/profile.d/hm-session-vars.sh
-  #
-  # or
-  #
-  #  ~/.local/state/nix/profiles/profile/etc/profile.d/hm-session-vars.sh
-  #
-  # or
-  #
-  #  /etc/profiles/per-user/jordanm/etc/profile.d/hm-session-vars.sh
-  #
-  home.sessionVariables = {
-    # EDITOR = "emacs";
-  };
-
-  # Let Home Manager install and manage itself.
-  # programs.home-manager.enable = true;
+  
+  # Add other Home Manager configurations here
+  
+  # This value determines the Home Manager release
+  home.stateVersion = "24.05"; # Match your NixOS version
 }
