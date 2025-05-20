@@ -8,13 +8,13 @@
   ];
 
 
-  # Home Manager
-  home-manager = {
-    extraSpecialArgs = {inherit inputs; };
-    users = {
-    "jordanm" = import ./home.nix;
-    };
-  };
+#  # Home Manager
+#  home-manager = {
+#    extraSpecialArgs = {inherit inputs; };
+#    users = {
+#    "jordanm" = import ./home.nix;
+#    };
+#  };
 
 
 
