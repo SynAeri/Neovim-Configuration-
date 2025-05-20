@@ -12,7 +12,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { self, nixpkgs, nixvim, ... }@inputs: {
+  outputs = { self, nixpkgs, nixvim, home-manager, ... }@inputs: {
     # You need to include home-manager in the destructuring ↑
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
