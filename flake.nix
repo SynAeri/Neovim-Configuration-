@@ -11,7 +11,7 @@
     { nixpkgs, home-manager, ... }:
     {
       nixosConfigurations = {
-        hostname = nixpkgs.lib.nixosSystem {
+        nixos = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
             ./configuration.nix
