@@ -6,31 +6,24 @@
     home-manager.url = "github:nix-community/home-manager";
     neovim ={
       url="github:nix-community/neovim-nightly-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
-    { nixpkgs, neovim, home-manager, ... }:
+    { self, nixpkgs, neovim, ... }:
     {
-      type = "app";
-      program = "${neovim.packages.x86_64-linux.neovim}/bin/nvim";
+      # Pkg definition
+      packages.x86_64-linux.default = neovim.packages.x86_64-linux.neovim;
+      
+      apps.x86_64-linux.default = {
+        type = "app";
+        program = "${neovim.packages.x86_64-linux.neovim}/bin/nvim";
+      };
       nixosConfigurations = {
-        
         nixos = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          modules = [
-            ./configuration.nix
-            home-manager.nixosModules.home-manager
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users.jordanm = import ./home.nix;
-
-              # Optionally, use home-manager.extraSpecialArgs to pass
-              # arguments to home.nix
-            }
-          ];
         };
       };
     };
