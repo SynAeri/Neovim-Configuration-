@@ -1,22 +1,37 @@
 # config/default.nix
 { pkgs }:
 let
-  scripts2ConfigFiles = dir:
-    let
-      configDir = pkgs.stdenv.mkDerivation {
-        name = "nvim-${dir}-configs";
-        src = ./${dir};
-        installPhase = ''
-          mkdir -p $out/
-          cp ./* $out/
-        '';
-      };
-    in builtins.map (file: "${configDir}/${file}")
+  # Process files in the main lua directory
+  mainLuaFiles = let
+    configDir = pkgs.stdenv.mkDerivation {
+      name = "nvim-lua-configs";
+      src = ./lua;
+      installPhase = ''
+        mkdir -p $out/
+        cp ./*.lua $out/ || true
+      '';
+    };
+  in builtins.map (file: "${configDir}/${file}")
     (builtins.attrNames (builtins.readDir configDir));
 
+  # Process files in the plugins subdirectory
+  pluginsLuaFiles = let
+    configDir = pkgs.stdenv.mkDerivation {
+      name = "nvim-lua-plugins-configs";
+      src = ./lua/plugins;
+      installPhase = ''
+        mkdir -p $out/
+        cp ./*.lua $out/ || true
+      '';
+    };
+  in builtins.map (file: "${configDir}/${file}")
+    (builtins.attrNames (builtins.readDir configDir));
+
+  # Create luafile commands for a list of files
   sourceConfigFiles = files:
     builtins.concatStringsSep "\n" (builtins.map (file:
       "luafile ${file}") files);
 
-  lua = scripts2ConfigFiles "lua";
-in sourceConfigFiles lua
+  # Combine all lua files, main files first
+  allLuaFiles = mainLuaFiles ++ pluginsLuaFiles;
+in sourceConfigFiles allLuaFiles
