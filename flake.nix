@@ -12,7 +12,7 @@
   };
 
   outputs =
-    { self, nixpkgs, neovim, ... }:
+    { self, nixpkgs, neovim, home-manager,  ... }:
     {
       # Pkg definition
       packages.x86_64-linux.default = neovim.packages.x86_64-linux.neovim;
