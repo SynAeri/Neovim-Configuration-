@@ -166,7 +166,7 @@ home-manager = {
   # System Packages
   environment.systemPackages = with pkgs; [
     # Editors
-    neovim
+#    neovim
 
     # SSH Sys
     openssh
@@ -275,7 +275,7 @@ home-manager = {
   # NIXOS
   nix.settings.trusted-users = [ "root" "jordanm" ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  programs.neovim.enable = false;
+#  programs.neovim.enable = false;
   # Additional Services
   # services.openssh.enable = true;
   # programs.mtr.enable = true;
