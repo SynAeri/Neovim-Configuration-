@@ -13,7 +13,10 @@
   outputs =
     { nixpkgs, neovim, home-manager, ... }:
     {
+      type = "app";
+      program = "${neovim.packages.x86_64-linux.neovim}/bin/nvim";
       nixosConfigurations = {
+        
         nixos = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
@@ -28,8 +31,6 @@
               # arguments to home.nix
             }
           ];
-         type = "app";
-         program = "${neovim.packages.x86_64-linux.neovim}/bin/nvim";
         };
       };
     };
