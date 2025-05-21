@@ -9,11 +9,11 @@
 
 
 # Home Manager setup
-home-manager = {
-  useGlobalPkgs = true;
-  useUserPackages = true;
-  users.jordanm = import ./home.nix;
-};
+#home-manager = {
+#  useGlobalPkgs = true;
+#  useUserPackages = true;
+#  users.jordanm = import ./home.nix;
+#};
 
 
 
