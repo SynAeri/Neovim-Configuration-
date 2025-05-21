@@ -1,7 +1,10 @@
 # packages/myNeovim.nix
 { pkgs }:
-    pkgs.wrapNeovim pkgs.neovim {
+let
+  customRC = import ../config { inherit pkgs; };
+in  pkgs.wrapNeovim pkgs.neovim {
       configure = {
+        inherit customRC;
          # here will come your custom configuration
       };
     }
