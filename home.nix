@@ -19,23 +19,23 @@ in
   # Let Home Manager manage itself
   programs.home-manager.enable = true;
   programs.git.enable = true;
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-    vimdiffAlias = true;
-    plugins = with pkgs.vimPlugins; [
-      nvim-lspconfig
-      nvim-treesitter.withAllGrammars
-      plenary-nvim
-      gruvbox-material
-      mini-nvim
-    ];
-    # Use the Nix package search engine to find
-    # even more plugins : https://search.nixos.org/packages
-  };
-  
+#  programs.neovim = {
+#    enable = true;
+#    defaultEditor = true;
+#    viAlias = true;
+#    vimAlias = true;
+#    vimdiffAlias = true;
+#    plugins = with pkgs.vimPlugins; [
+#      nvim-lspconfig
+#      nvim-treesitter.withAllGrammars
+#      plenary-nvim
+#      gruvbox-material
+#      mini-nvim
+#    ];
+#    # Use the Nix package search engine to find
+#    # even more plugins : https://search.nixos.org/packages
+#  };
+#  
   # Add other Home Manager configurations here
   
   # This value determines the Home Manager release
