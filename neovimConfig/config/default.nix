@@ -18,5 +18,5 @@ let
     builtins.concatStringsSep "\n" (builtins.map (file:
       "luafile ${file}") files);
 
-  vim = scripts2ConfigFiles "lua";
+  lua = scripts2ConfigFiles "lua";
 in sourceConfigFiles lua
