@@ -13,7 +13,26 @@
 
   outputs =
     { self, nixpkgs, neovim, home-manager,  ... }:
-    {
+
+     let
+      overlayFlakeInputs = prev: final: {
+        neovim = neovim.packages.x86_64-linux.neovim;
+      };
+
+      overlayMyNeovim = prev: final: {
+        myNeovim = import ./modules/neovim/default.nix {
+          pkgs = final;
+        };
+      };
+
+      pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        overlays = [ overlayFlakeInputs overlayMyNeovim ];
+      };
+
+     in {
+
+
       # Pkg definition
       packages.x86_64-linux.default = neovim.packages.x86_64-linux.neovim;
       
