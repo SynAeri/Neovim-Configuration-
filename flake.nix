@@ -8,7 +8,7 @@
   };
 
   outputs =
-    { self, nixpkgs, neovim, home-manager,  ... }:
+    { self, nixpkgs, home-manager,  ... }:
     {
       nixosConfigurations = {
         nixos = nixpkgs.lib.nixosSystem {
