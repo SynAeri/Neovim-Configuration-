@@ -19,7 +19,7 @@
             # Add Neovim to system packages
             ({ pkgs, system, ... }: {
               environment.systemPackages = [
-                neovim-config.packages.${system}.default
+                neovim-config.packages.x86_64-linux.default
               ];
             })
           ];
