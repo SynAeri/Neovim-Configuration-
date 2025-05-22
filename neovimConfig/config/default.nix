@@ -1,29 +1,26 @@
 # config/default.nix
 { pkgs }:
 let
-  # Create configs that preserve the module structure
-  configs = pkgs.stdenv.mkDerivation {
-    name = "nvim-configs";
-    src = ./lua;
-    installPhase = ''
-      mkdir -p $out
-      cp -r . $out/
-      
-      # Ensure chadrc.lua is available as a proper module
-      # Copy it to the root of the lua modules path
-      if [ -f chadrc.lua ]; then
-        cp chadrc.lua $out/chadrc.lua
-      fi
-    '';
-  };
+  scripts2ConfigFiles = dir:
+    let
+      configDir = pkgs.stdenv.mkDerivation {
+        name = "nvim-${dir}-configs";
+        src = ./${dir};
+        installPhase = ''
+          mkdir -p $out/
+          cp ./* $out/ 2>/dev/null || true
+        '';
+      };
+    in builtins.map (file: "${configDir}/${file}")
+    (builtins.attrNames (builtins.readDir configDir));
 
-in ''
-  -- Set up the Lua module path to include our configs
-  lua package.path = "${configs}/?.lua;" .. "${configs}/?/init.lua;" .. package.path
-  
-  luafile ${configs}/nvim-0-init.lua
-  luafile ${configs}/nvim-setters.lua
-  luafile ${configs}/plugins/nvim-chadui.lua
-  luafile ${configs}/plugins/nvim-telescope.lua
-  luafile ${configs}/plugins/nvim-treesitter.lua
-''
+  sourceConfigFiles = files:
+    builtins.concatStringsSep "\n" (builtins.map (file:
+      (if pkgs.lib.strings.hasSuffix ".lua" file then "luafile" else "source")
+      + " ${file}") files);
+
+  vim = scripts2ConfigFiles "vim";
+  lua = scripts2ConfigFiles "lua";
+
+in builtins.concatStringsSep "\n"
+(builtins.map (configs: sourceConfigFiles configs) [ vim lua ])
