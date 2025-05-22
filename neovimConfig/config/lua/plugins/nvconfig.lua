@@ -101,4 +101,4 @@ local options = {
 
 -- Try to load user's custom configuration (optional)
 local status, chadrc = pcall(require, "chadrc")
-return vim.tbl_deep_extend("f
+return vim.tbl_deep_extend("force", options, status and chadrc or {})
