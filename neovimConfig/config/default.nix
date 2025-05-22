@@ -17,13 +17,3 @@ let
       cp -r . $out/
     '';
   };
-  # Generate luanix configs (including nvconfig.lua)
-  luanix = nixFiles2ConfigFiles "luanix";
-in ''
-  ${builtins.concatStringsSep "\n" (builtins.map (file: "luafile ${file}") luanix)}
-  luafile ${configs}/nvim-0-init.lua
-  luafile ${configs}/nvim-setters.lua
-  luafile ${configs}/plugins/nvim-chadui.lua
-  luafile ${configs}/plugins/nvim-telescope.lua
-  luafile ${configs}/plugins/nvim-treesitter.lua
-''
