@@ -1,7 +1,6 @@
 # config/default.nix
 { pkgs }:
 let
-  # Handle .nix files that generate lua (from the document)
   nixFiles2ConfigFiles = dir:
     builtins.map (file:
       pkgs.writeTextFile {
@@ -9,24 +8,27 @@ let
         text = import ./${dir}/${file} { inherit pkgs; };
       }) (builtins.attrNames (builtins.readDir ./${dir}));
 
-  # Your existing function for regular files
-  configs = pkgs.stdenv.mkDerivation {
-    name = "nvim-configs";
-    src = ./lua;
-    installPhase = ''
-      mkdir -p $out
-      cp -r . $out/
-    '';
-  };
+  scripts2ConfigFiles = dir:
+    let
+      configDir = pkgs.stdenv.mkDerivation {
+        name = "nvim-${dir}-configs";
+        src = ./${dir};
+        installPhase = ''
+          mkdir -p $out/
+          cp ./* $out/
+        '';
+      };
+    in builtins.map (file: "${configDir}/${file}")
+    (builtins.attrNames (builtins.readDir configDir));
 
-  # Generate luanix configs (including nvconfig.lua)
+  sourceConfigFiles = files:
+    builtins.concatStringsSep "\n" (builtins.map (file:
+      (if pkgs.lib.strings.hasSuffix "lua" file then "luafile" else "source")
+      + " ${file}") files);
+
+  vim = scripts2ConfigFiles "vim";
+  lua = scripts2ConfigFiles "lua";
   luanix = nixFiles2ConfigFiles "luanix";
 
-in ''
-  ${builtins.concatStringsSep "\n" (builtins.map (file: "luafile ${file}") luanix)}
-  luafile ${configs}/nvim-0-init.lua
-  luafile ${configs}/nvim-setters.lua
-  luafile ${configs}/plugins/nvim-chadui.lua
-  luafile ${configs}/plugins/nvim-telescope.lua
-  luafile ${configs}/plugins/nvim-treesitter.lua
-''
+in builtins.concatStringsSep "\n"
+(builtins.map (configs: sourceConfigFiles configs) [ vim lua luanix])
