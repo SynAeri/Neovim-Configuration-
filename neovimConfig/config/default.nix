@@ -1,29 +1,26 @@
 # config/default.nix
 { pkgs }:
 let
-  # Handle .nix files that generate lua (from the document)
-  nixFiles2ConfigFiles = dir:
-    builtins.map (file:
-      pkgs.writeTextFile {
-        name = pkgs.lib.strings.removeSuffix ".nix" file;
-        text = import ./${dir}/${file} { inherit pkgs; };
-      }) (builtins.attrNames (builtins.readDir ./${dir}));
-
-  # Your existing function for regular files
+  # Create configs that preserve the module structure
   configs = pkgs.stdenv.mkDerivation {
     name = "nvim-configs";
     src = ./lua;
     installPhase = ''
       mkdir -p $out
       cp -r . $out/
+      
+      # Ensure chadrc.lua is available as a proper module
+      # Copy it to the root of the lua modules path
+      if [ -f chadrc.lua ]; then
+        cp chadrc.lua $out/chadrc.lua
+      fi
     '';
   };
 
-  # Generate luanix configs (including nvconfig.lua)
-  luanix = nixFiles2ConfigFiles "luanix";
-
 in ''
-  ${builtins.concatStringsSep "\n" (builtins.map (file: "luafile ${file}") luanix)}
+  -- Set up the Lua module path to include our configs
+  lua package.path = "${configs}/?.lua;" .. "${configs}/?/init.lua;" .. package.path
+  
   luafile ${configs}/nvim-0-init.lua
   luafile ${configs}/nvim-setters.lua
   luafile ${configs}/plugins/nvim-chadui.lua
