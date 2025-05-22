@@ -4,6 +4,6 @@ with pkgs.vimPlugins; [
   plenary-nvim
   nvchad-ui
   base46
-
+  nvim-web-devicons
   lazy-nvim
 ]
