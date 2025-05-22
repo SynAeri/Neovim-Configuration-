@@ -1,26 +1,25 @@
 # config/default.nix
 { pkgs }:
 let
-  scripts2ConfigFiles = dir:
-    let
-      configDir = pkgs.stdenv.mkDerivation {
-        name = "nvim-${dir}-configs";
-        src = ./${dir};
-        installPhase = ''
-          mkdir -p $out/
-          cp ./* $out/ 2>/dev/null || true
-        '';
-      };
-    in builtins.map (file: "${configDir}/${file}")
-    (builtins.attrNames (builtins.readDir configDir));
+  # Create configs preserving the nested structure
+  configs = pkgs.stdenv.mkDerivation {
+    name = "nvim-configs";
+    src = ./lua;
+    installPhase = ''
+      mkdir -p $out
+      # Copy everything preserving the directory structure
+      cp -r . $out/
+    '';
+  };
 
-  sourceConfigFiles = files:
-    builtins.concatStringsSep "\n" (builtins.map (file:
-      (if pkgs.lib.strings.hasSuffix ".lua" file then "luafile" else "source")
-      + " ${file}") files);
-
-  vim = scripts2ConfigFiles "vim";
-  lua = scripts2ConfigFiles "lua";
-
-in builtins.concatStringsSep "\n"
-(builtins.map (configs: sourceConfigFiles configs) [ vim lua ])
+in ''
+  -- Add the configs directory to Lua's package path so require() can find modules
+  lua package.path = "${configs}/?.lua;" .. "${configs}/?/init.lua;" .. package.path
+  
+  -- Load the configuration files in order
+  luafile ${configs}/nvim-0-init.lua
+  luafile ${configs}/nvim-setters.lua
+  luafile ${configs}/plugins/nvim-chadui.lua
+  luafile ${configs}/plugins/nvim-telescope.lua
+  luafile ${configs}/plugins/nvim-treesitter.lua
+''
