@@ -1,6 +1,34 @@
 # config/default.nix
 { pkgs }:
 let
+  # Recursively find all .lua files
+  findLuaFiles = dir:
+    let
+      entries = builtins.readDir dir;
+      
+      # Get regular .lua files in current directory
+      luaFiles = builtins.filter (name: 
+        entries.${name} == "regular" && pkgs.lib.hasSuffix ".lua" name
+      ) (builtins.attrNames entries);
+      
+      # Get subdirectories
+      subdirs = builtins.filter (name: 
+        entries.${name} == "directory"
+      ) (builtins.attrNames entries);
+      
+      # Recursively get files from subdirectories
+      subFiles = builtins.concatLists (builtins.map (subdir:
+        let
+          subPath = dir + "/${subdir}";
+          subEntries = builtins.readDir subPath;
+          subLuaFiles = builtins.filter (name:
+            subEntries.${name} == "regular" && pkgs.lib.hasSuffix ".lua" name
+          ) (builtins.attrNames subEntries);
+        in builtins.map (file: "${subdir}/${file}") subLuaFiles
+      ) subdirs);
+      
+    in luaFiles ++ subFiles;
+
   scripts2ConfigFiles = dir:
     let
       configDir = pkgs.stdenv.mkDerivation {
@@ -8,16 +36,17 @@ let
         src = ./${dir};
         installPhase = ''
           mkdir -p $out/
-          cp -r . $out/  # Use -r to preserve directory structure
+          cp -r . $out/
         '';
       };
-    in builtins.map (file: "${configDir}/${file}")
-    (builtins.attrNames (builtins.readDir configDir));
+      
+      allFiles = findLuaFiles ./${dir};
+      
+    in builtins.map (file: "${configDir}/${file}") allFiles;
 
   sourceConfigFiles = files:
     builtins.concatStringsSep "\n" (builtins.map (file:
-      (if pkgs.lib.strings.hasSuffix "lua" file then "luafile" else "source")
-      + " ${file}") files);
+      "luafile ${file}") files);
 
   # Get the lua config directory for package path
   luaConfigDir = pkgs.stdenv.mkDerivation {
