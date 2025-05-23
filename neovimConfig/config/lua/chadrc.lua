@@ -58,7 +58,7 @@ M.nvdash = {
     { txt = "─", hl = "NvDashFooter", no_gap = true, rep = true },
     {
       -- Fixed: Simple text instead of function that requires lazy.nvim
-      txt = "  Neovim Ready!",
+      txt = "  Your drill is the drill that will pierce the heavens",
       hl = "NvDashFooter",
       no_gap = true,
     },
