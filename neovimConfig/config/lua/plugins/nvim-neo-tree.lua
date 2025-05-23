@@ -19,4 +19,4 @@ neoTree.setup({
       },
 })
 
-vim.keymap.set("n", "<leader>tr", ":Neotree toggle right<CR>", { desc = "Toggle Neo-tree" })
+vim.api.nvim_set_keymap("n", "<leader>tr", ":Neotree toggle right<CR>", { desc = "Toggle Neo-tree" })
