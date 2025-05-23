@@ -1,34 +1,6 @@
 # config/default.nix
 { pkgs }:
 let
-  # Recursively find all .lua files
-  findLuaFiles = dir:
-    let
-      entries = builtins.readDir dir;
-      
-      # Get regular .lua files in current directory
-      luaFiles = builtins.filter (name: 
-        entries.${name} == "regular" && pkgs.lib.hasSuffix ".lua" name
-      ) (builtins.attrNames entries);
-      
-      # Get subdirectories
-      subdirs = builtins.filter (name: 
-        entries.${name} == "directory"
-      ) (builtins.attrNames entries);
-      
-      # Recursively get files from subdirectories
-      subFiles = builtins.concatLists (builtins.map (subdir:
-        let
-          subPath = dir + "/${subdir}";
-          subEntries = builtins.readDir subPath;
-          subLuaFiles = builtins.filter (name:
-            subEntries.${name} == "regular" && pkgs.lib.hasSuffix ".lua" name
-          ) (builtins.attrNames subEntries);
-        in builtins.map (file: "${subdir}/${file}") subLuaFiles
-      ) subdirs);
-      
-    in luaFiles ++ subFiles;
-
   scripts2ConfigFiles = dir:
     let
       configDir = pkgs.stdenv.mkDerivation {
@@ -40,15 +12,22 @@ let
         '';
       };
       
-      allFiles = findLuaFiles ./${dir};
+      # Get all entries in the directory
+      entries = builtins.readDir configDir;
       
-    in builtins.map (file: "${configDir}/${file}") allFiles;
+      # Filter to only include regular files (not directories)
+      fileNames = builtins.filter (name: 
+        entries.${name} == "regular"  # This excludes the "plugins" directory
+      ) (builtins.attrNames entries);
+      
+    in builtins.map (file: "${configDir}/${file}") fileNames;
 
   sourceConfigFiles = files:
     builtins.concatStringsSep "\n" (builtins.map (file:
-      "luafile ${file}") files);
+      (if pkgs.lib.strings.hasSuffix "lua" file then "luafile" else "source")
+      + " ${file}") files);
 
-  # Get the lua config directory for package path
+  # Get the lua config directory for package path  
   luaConfigDir = pkgs.stdenv.mkDerivation {
     name = "nvim-lua-configs";
     src = ./lua;
