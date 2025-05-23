@@ -43,7 +43,8 @@
   # Hardware & Firmware
   hardware.enableRedistributableFirmware = true;
   hardware.enableAllFirmware = true;
-  
+  xdg.portal.enable = true;
+
   # Intel Graphics
   services.xserver.videoDrivers = [ "modesetting" ];
   hardware.graphics = {
