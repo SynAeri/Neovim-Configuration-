@@ -208,6 +208,7 @@
     dbus
     pcre2
     uthash
+    flatpak
 
     # Web & Media
     firefox
