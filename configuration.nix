@@ -23,7 +23,7 @@
 
   boot.initrd.kernelModules = [ "i2c_hid"];
   # System & Bootloader
-  # system.stateVersion = "24.11"; # Did you read the comment?
+  system.stateVersion = "24.11"; # Did you read the comment?
   boot.loader.systemd-boot.enable = true;
   # boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -39,6 +39,19 @@
     #"i8042.nopnp=1"
     #"i8042.dumbkbd=1"
   ];
+
+
+  # XDG Configurations
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = "*";
+  };
+
+  # Flatpack Activation
+  services.flatpak.enable = true;
+
 
   # Hardware & Firmware
   hardware.enableRedistributableFirmware = true;
