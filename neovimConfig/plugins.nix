@@ -7,7 +7,9 @@ with pkgs.vimPlugins; [
   nvim-web-devicons
   lazy-nvim
   nvim-treesitter.withAllGrammars
-  
+
+  neo-tree-nvim  
+
   # Tree-sitter related plugins
   nvim-treesitter-textobjects  # Enhanced text objects
   nvim-treesitter-context      # Show current function/class context
