@@ -1,21 +1,37 @@
 # config/default.nix
 { pkgs }:
 let
-  # Your existing function for regular files (keep this exactly as it was)
-  configs = pkgs.stdenv.mkDerivation {
-    name = "nvim-configs";
+  scripts2ConfigFiles = dir:
+    let
+      configDir = pkgs.stdenv.mkDerivation {
+        name = "nvim-${dir}-configs";
+        src = ./${dir};
+        installPhase = ''
+          mkdir -p $out/
+          cp -r . $out/  # Use -r to preserve directory structure
+        '';
+      };
+    in builtins.map (file: "${configDir}/${file}")
+    (builtins.attrNames (builtins.readDir configDir));
+
+  sourceConfigFiles = files:
+    builtins.concatStringsSep "\n" (builtins.map (file:
+      (if pkgs.lib.strings.hasSuffix "lua" file then "luafile" else "source")
+      + " ${file}") files);
+
+  # Get the lua config directory for package path
+  luaConfigDir = pkgs.stdenv.mkDerivation {
+    name = "nvim-lua-configs";
     src = ./lua;
     installPhase = ''
-      mkdir -p $out
+      mkdir -p $out/
       cp -r . $out/
     '';
   };
 
+  lua = scripts2ConfigFiles "lua";
+
 in ''
-  lua package.path = "${configs}/?.lua;" .. "${configs}/?/init.lua;" .. package.path
-  luafile ${configs}/nvim-0-init.lua
-  luafile ${configs}/nvim-setters.lua
-  luafile ${configs}/plugins/nvim-chadui.lua
-  luafile ${configs}/plugins/nvim-telescope.lua
-  luafile ${configs}/plugins/nvim-treesitter.lua
+  lua package.path = "${luaConfigDir}/?.lua;" .. "${luaConfigDir}/?/init.lua;" .. package.path
+  ${sourceConfigFiles lua}
 ''
