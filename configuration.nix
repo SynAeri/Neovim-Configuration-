@@ -128,6 +128,7 @@
   
   services.displayManager.ly.enable = true;
   services.pipewire.enable = true;
+  services.flatpak.enable = true;
 
   # Security
   security.sudo.extraConfig = ''
