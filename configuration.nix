@@ -42,8 +42,7 @@
 
   # Hardware & Firmware
   hardware.enableRedistributableFirmware = true;
-  hardware.enableAllFirmware = true;
-  xdg.portal.enable = true;
+  hardware.enableAllFirmware = true; 
 
   # Intel Graphics
   services.xserver.videoDrivers = [ "modesetting" ];
@@ -129,7 +128,6 @@
   
   services.displayManager.ly.enable = true;
   services.pipewire.enable = true;
-  services.flatpak.enable = true;
 
   # Security
   security.sudo.extraConfig = ''
