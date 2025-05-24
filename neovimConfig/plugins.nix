@@ -9,6 +9,7 @@ with pkgs.vimPlugins; [
   nvim-treesitter.withAllGrammars
 
   neo-tree-nvim  
+  toggleterm-nvim
 
   # Tree-sitter related plugins
   nvim-treesitter-textobjects  # Enhanced text objects
