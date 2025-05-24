@@ -4,14 +4,6 @@ print("=== DEBUG: Lua paths and available modules ===")
 -- Check lua path
 print("package.path:", package.path)
 
--- Check what's in the current directory  
-local handle = io.popen("ls -la")
-if handle then
-  local result = handle:read("*a")
-  handle:close()
-  print("Current directory contents:", result)
-end
-
 -- Try to find chadrc.lua in different ways
 print("Attempting to find chadrc.lua...")
 
